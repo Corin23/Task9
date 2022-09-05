@@ -63,13 +63,12 @@ int *readURL(const char *URL) {
     }
   }
 
+  return retArrCurl;
   curl_easy_cleanup(curl_handle);
 
   free(chunk.memory);
 
   curl_global_cleanup();
-
-  return retArrCurl;
 }
 
 static int *countChars(const char *input) {
@@ -85,17 +84,15 @@ static int *countChars(const char *input) {
     }
     fclose(file);
   }
-
   else if (readURL(input) != NULL) {
     retArr = readURL(input);
-  } else {
+  } 
+  else {
     for (int i = 0; i < strlen(input); i++) {
-      c = input[i];
-      retArr[c]++;
+      retArr[(int)input[i]]++;
     }
   }
   return retArr;
-  free(retArr);
 }
 
 static float getPercentage(int *input1_arr, int *input2_arr) {
@@ -125,9 +122,14 @@ int main(int argc, char *argv[]) {
     printf("Too many arguments! You only need 2: input1 and input2.\n");
     exit(EXIT_FAILURE);
   }
+  for(int i=0; i<argc; i++){
+    printf("%d %s\n", i, argv[i]);
+  }
+  const char *arg1 = strdup(argv[1]);
+  const char *arg2 = strdup(argv[2]);
 
-  input1 = countChars(argv[1]);
-  input2 = countChars(argv[2]);
+  input1 = countChars(arg1);
+  input2 = countChars(arg2);
 
   printf("%s %s\n", argv[1], argv[2]);
 
@@ -137,6 +139,6 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < 128; i++) {
     printf("input2: %d %d\n", i, input2[i]);
   }
-  result = getPercentage(input1, input2);
-  printf("%.2f\n", result);
+ result = getPercentage(input1, input2);
+ printf("%.2f\n", result);
 }
