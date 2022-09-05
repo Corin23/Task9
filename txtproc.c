@@ -32,7 +32,7 @@ int *readURL(const char *URL) {
   CURL *curl_handle;
   CURLcode res;
   int c;
-  int *retArrCurl = malloc(128 * sizeof(int));
+  int *retArrCurl = calloc(128, sizeof(int));
   struct MemoryStruct chunk;
 
   chunk.memory = malloc(1);
@@ -73,7 +73,7 @@ int *readURL(const char *URL) {
 
 static int *countChars(const char *input) {
   int c;
-  int *retArr = malloc(128 * sizeof(int));
+  int *retArr = calloc(128, sizeof(int));
 
   FILE *file;
   file = fopen(input, "r");
@@ -122,23 +122,12 @@ int main(int argc, char *argv[]) {
     printf("Too many arguments! You only need 2: input1 and input2.\n");
     exit(EXIT_FAILURE);
   }
-  for(int i=0; i<argc; i++){
-    printf("%d %s\n", i, argv[i]);
-  }
   const char *arg1 = strdup(argv[1]);
   const char *arg2 = strdup(argv[2]);
 
   input1 = countChars(arg1);
   input2 = countChars(arg2);
 
-  printf("%s %s\n", argv[1], argv[2]);
-
-  for (int i = 0; i < 128; i++) {
-    printf("input1: %d %d\n", i, input1[i]);
-  }
-  for (int i = 0; i < 128; i++) {
-    printf("input2: %d %d\n", i, input2[i]);
-  }
  result = getPercentage(input1, input2);
  printf("%.2f\n", result);
 }
