@@ -1,0 +1,32 @@
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc "abc   def" "a c"
+55.56
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc text1.txt "a c"
+55.56
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc "abc   def" text2.txt
+55.56
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc text1.txt text2.txt
+55.56
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ cat text1.txt
+abc   def
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ cat text2.txt
+a c
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc https://www.gutenberg.org/cache/epub/345/pg345.txt "a"
+5.96
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc https://www.gutenberg.org/cache/epub/345/pg345.txt text2.txt
+5.96
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ cat text2.txt
+a
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc https://www.gutenberg.org/cache/epub/345/pg345.txt https://www.gutenberg.org/cache/epub/345/pg345.txt
+100.00
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc "abc" "def"
+0.00
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc " " " "
+100.00
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc "a c" " "
+33.33
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ ./txtproc  https://www.gutenberg.org/cache/epub/345/pg345.txt text2.txt
+9.31
+corin@otp-cdobrica-l1:~/Desktop/Tasks/Task9$ cat text2.txt
+a
+
+c
