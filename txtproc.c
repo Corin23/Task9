@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+const char *IS_URL = "https";
+const char *IS_FILE = "txt";
+
 struct MemoryStruct {
   char *memory;
   size_t size;
@@ -28,11 +31,10 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb,
   return realsize;
 }
 
-static int *readURL(const char *URL) {
+static void countURL(int *urlbuf, const char *URL) {
   CURL *curl_handle;
   CURLcode res;
   int c;
-  int *retArrCurl = calloc(128, sizeof(int));
   struct MemoryStruct chunk;
 
   chunk.memory = malloc(1);
@@ -51,19 +53,18 @@ static int *readURL(const char *URL) {
   curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
   res = curl_easy_perform(curl_handle);
-
   if (res != CURLE_OK) {
     // fprintf(stderr, "curl_easy_perform() failed: %s\n",
-    //       curl_easy_strerror(res));
-    retArrCurl = NULL;
+    //     curl_easy_strerror(res));
+    urlbuf = NULL;
   } else {
     for (int i = 0; i < chunk.size; i++) {
       c = chunk.memory[i];
-      retArrCurl[c]++;
+      if (c > 0)
+        urlbuf[c]++;
     }
   }
 
-  return retArrCurl;
   curl_easy_cleanup(curl_handle);
 
   free(chunk.memory);
@@ -71,28 +72,24 @@ static int *readURL(const char *URL) {
   curl_global_cleanup();
 }
 
-static int *countChars(const char *input) {
+static void countFile(int *filebuf, const char *input) {
   int c;
-  int *retArr = calloc(128, sizeof(int));
 
   FILE *file;
   file = fopen(input, "r");
 
-  if (file != NULL) {
+  if (file) {
     while ((c = getc(file)) != EOF) {
-      retArr[c]++;
+      filebuf[c]++;
     }
     fclose(file);
-  }
-  else if (readURL(input) != NULL) {
-    retArr = readURL(input);
-  } 
-  else {
-    for (int i = 0; i < strlen(input); i++) {
-      retArr[(int)input[i]]++;
-    }
-  }
-  return retArr;
+  } else
+    printf("Couldn't open the file!");
+}
+
+static void countChars(int *strbuf, const char *input) {
+  for (int i = 0; i < strlen(input); i++)
+    strbuf[(int)input[i]]++;
 }
 
 static float getPercentage(int *input1_arr, int *input2_arr) {
@@ -111,7 +108,8 @@ static float getPercentage(int *input1_arr, int *input2_arr) {
 
 int main(int argc, char *argv[]) {
   float result = 1;
-  int *input1, *input2;
+  int input1[128] = {0}, input2[128] = {0};
+  const char *firstarg, *secondarg, *exten1, *exten2;
 
   if (argc < 3) {
     printf("You need to enter two arguments: input1 and input2\n");
@@ -122,12 +120,29 @@ int main(int argc, char *argv[]) {
     printf("Too many arguments! You only need 2: input1 and input2.\n");
     exit(EXIT_FAILURE);
   }
-  const char *arg1 = strdup(argv[1]);
-  const char *arg2 = strdup(argv[2]);
 
-  input1 = countChars(arg1);
-  input2 = countChars(arg2);
+  firstarg = argv[1];
+  secondarg = argv[2];
 
- result = getPercentage(input1, input2);
- printf("%.2f\n", result);
+  exten1 = &firstarg[strlen(firstarg) - 3];
+  exten2 = &secondarg[strlen(secondarg) - 3];
+
+  if (strncmp(IS_URL, argv[1], 5) == 0) {
+    countURL(input1, argv[1]);
+  } else if (strncmp(IS_FILE, exten1, 3) == 0) {
+    countFile(input1, argv[1]);
+  } else {
+    countChars(input1, argv[1]);
+  }
+
+  if (strncmp(IS_URL, argv[2], 5) == 0) {
+    countURL(input2, argv[2]);
+  } else if (strncmp(IS_FILE, exten2, 3) == 0) {
+    countFile(input2, argv[2]);
+  } else {
+    countChars(input2, argv[2]);
+  }
+
+  result = getPercentage(input1, input2);
+  printf("%.2f\n", result);
 }
