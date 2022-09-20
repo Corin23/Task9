@@ -60,7 +60,7 @@ static void countURL(int *urlbuf, const char *URL) {
   } else {
     for (int i = 0; i < chunk.size; i++) {
       c = chunk.memory[i];
-      if (c > 0)
+      if (c >= 0 && c<= 128)
         urlbuf[c]++;
     }
   }
@@ -73,28 +73,39 @@ static void countURL(int *urlbuf, const char *URL) {
 }
 
 static void countFile(int *filebuf, const char *input) {
-  int c;
+   int c;
 
   FILE *file;
   file = fopen(input, "r");
 
-  if (file) {
-    while ((c = getc(file)) != EOF) {
-      filebuf[c]++;
-    }
-    fclose(file);
-  } else
+  if (!file) {
     printf("Couldn't open the file!");
+    exit(EXIT_FAILURE);
+  }
+  
+  while ((c = fgetc(file)) != EOF) {
+    if(c >= 0 && c <= 128){
+      filebuf[c]++;
+      }
+    }
+    
+  fclose(file);
+    
 }
 
 static void countChars(int *strbuf, const char *input) {
-  for (int i = 0; i < strlen(input); i++)
-    strbuf[(int)input[i]]++;
+   int ch;
+   int c = 0;
+
+  while((ch = input[c]) != '\0'){
+    strbuf[ch]++;
+    c++;
+  }
 }
 
 static float getPercentage(int *input1_arr, int *input2_arr) {
-  int counter = 0, length = 0;
-  float result;
+   int counter = 0, length = 0;
+   float result;
 
   for (int i = 0; i < 128; i++) {
     if ((input1_arr[i] && input2_arr[i]) != 0) {
@@ -102,13 +113,12 @@ static float getPercentage(int *input1_arr, int *input2_arr) {
     }
     length += input1_arr[i];
   }
-
   return result = (float)counter / length * 100;
 }
 
 int main(int argc, char *argv[]) {
-  float result = 1;
-  int input1[128] = {0}, input2[128] = {0};
+  static float result = 1;
+  static int input1[128] = {0}, input2[128] = {0};
   const char *firstarg, *secondarg, *exten1, *exten2;
 
   if (argc < 3) {
@@ -127,20 +137,20 @@ int main(int argc, char *argv[]) {
   exten1 = &firstarg[strlen(firstarg) - 3];
   exten2 = &secondarg[strlen(secondarg) - 3];
 
-  if (strncmp(IS_URL, argv[1], 5) == 0) {
-    countURL(input1, argv[1]);
+  if (strncmp(IS_URL, firstarg, 5) == 0){
+    countURL(input1, firstarg);
   } else if (strncmp(IS_FILE, exten1, 3) == 0) {
-    countFile(input1, argv[1]);
+    countFile(input1, firstarg);
   } else {
-    countChars(input1, argv[1]);
+    countChars(input1, firstarg);
   }
 
-  if (strncmp(IS_URL, argv[2], 5) == 0) {
-    countURL(input2, argv[2]);
+  if (strncmp(IS_URL, secondarg, 5) == 0) {
+    countURL(input2, secondarg);
   } else if (strncmp(IS_FILE, exten2, 3) == 0) {
-    countFile(input2, argv[2]);
+    countFile(input2, secondarg);
   } else {
-    countChars(input2, argv[2]);
+    countChars(input2, secondarg);
   }
 
   result = getPercentage(input1, input2);
